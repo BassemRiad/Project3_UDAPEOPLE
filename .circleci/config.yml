@@ -55,7 +55,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/6U6w7SxioPynuMXMoVwJS7/migration_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl --insecure https://kvdb.io/HXaNhoSpELJXTgjgQ9Gz5n/migration_<< parameters.Workflow_ID >>)
             if (( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -233,7 +233,7 @@ jobs:
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-              curl https://kvdb.io/6U6w7SxioPynuMXMoVwJS7/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+              curl --insecure https://kvdb.io/HXaNhoSpELJXTgjgQ9Gz5n/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
       - destroy-environment
       - revert-migrations
@@ -299,12 +299,13 @@ jobs:
       - run:
           name: Package Backend
           command: |
-            cd backend       
+            cd backend      
+            npm install 
             npm run build
             tar -czf artifact.tar.gz dist/* package*
 
             cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            sudo cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
 
       - run:
           name: Deploy backend
@@ -372,7 +373,7 @@ jobs:
             echo $OLD_WORKFLOW_ID >> ~/OLD_WORKFLOW_ID.txt
             cat ~/OLD_WORKFLOW_ID.txt
 
-            curl https://kvdb.io/6U6w7SxioPynuMXMoVwJS7/old_workflow_id -d "${OLD_WORKFLOW_ID}"
+            curl --insecure https://kvdb.io/HXaNhoSpELJXTgjgQ9Gz5n/old_workflow_id -d "${OLD_WORKFLOW_ID}"
 
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
