@@ -388,7 +388,7 @@ jobs:
 
       # Here's where you ill add some code to rollback on failure  
 
-cleanup:
+  cleanup:
     docker:
       - image: cimg/base:stable
     steps:
